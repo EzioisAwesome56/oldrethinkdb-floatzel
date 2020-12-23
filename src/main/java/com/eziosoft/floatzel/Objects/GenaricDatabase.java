@@ -1,4 +1,4 @@
-package com.eziosoft.oldrethink;
+package com.eziosoft.floatzel.Objects;
 
 public interface GenaricDatabase {
 

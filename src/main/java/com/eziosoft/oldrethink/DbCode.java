@@ -1,5 +1,6 @@
 package com.eziosoft.oldrethink;
 
+import com.eziosoft.floatzel.Objects.GenaricDatabase;
 import com.google.gson.Gson;
 import com.rethinkdb.RethinkDB;
 import com.rethinkdb.gen.exc.ReqlError;
@@ -143,13 +144,14 @@ public class DbCode implements GenaricDatabase {
 
     @Override
     public void initDatabase() {
+        System.out.println(info.getUser());
         // lifted straight from floatzel 2.5.6.4's codebase, with minor tweaks
         Connection.Builder builder = r.connection().hostname("localhost").port(28015);
-        if (!info.getUser().equals("null")) {
-            builder.user(info.getUser(), !info.getPass().equals("null") ? info.getPass() : "");
+        /*if (!info.getUser().equals("null")) {
+            builder.user(info.getUser(), info.getPass().equals("null") ? "" : info.getPass());
         } else {
-            builder.user("admin", !info.getPass().equals("null") ? info.getPass() : "");
-        }
+            builder.user("admin", info.getPass().equals("null") ? "" : info.getPass());
+        }*/
 
         thonk = builder.connect();
         System.out.println("Eziosoft RethinkDB Driver v1.0 now starting up...");
