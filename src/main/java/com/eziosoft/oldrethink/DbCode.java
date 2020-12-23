@@ -10,7 +10,6 @@ import java.util.List;
 
 public class DbCode implements GenaricDatabase {
 
-    private static Cursor cur = null;
     private static final RethinkDB r = RethinkDB.r;
     private static Connection thonk;
     private static Gson gson = new Gson();
@@ -49,7 +48,14 @@ public class DbCode implements GenaricDatabase {
 
     @Override
     public String getProfile(String id) {
-        return null;
+        // this is gonna be one hell of a clusterfuck
+        User h = new User(
+                id,
+                loadBal(id),
+                getLoanTime(id),
+
+        );
+        return gson.toJson(h);
     }
 
     @Override
@@ -58,6 +64,7 @@ public class DbCode implements GenaricDatabase {
         User h = gson.fromJson(json, User.class);
         // then run the many, many, MANY functions to save the profile
         saveBal(h.getUid(), h.getBal());
+        saveLoanTime(h.getUid(), h.getLastloan());
 
 
     }
@@ -70,7 +77,13 @@ public class DbCode implements GenaricDatabase {
         }
     }
 
+    private int loadBal(String id){
+        Cursor h = r.table(banktable).filter(row -> row.g("uid").eq(id)).getField("bal").run(thonk);
+        return Integer.valueOf(getValue(h));
+    }
+
     private Long getLoanTime(String uid){
+        Cursor cur = null;
         // first we check if they even have an entry in the table
         if (!(boolean)r.table(loantable).filter(r.hashMap("uid", uid)).count().eq(1).run(thonk)){
             // just save them a 0 and return 0
@@ -80,6 +93,10 @@ public class DbCode implements GenaricDatabase {
             cur = r.table(loantable).filter(row -> row.g("uid").eq(uid)).getField("time").run(thonk);
             return Long.valueOf(getValue(cur));
         }
+    }
+
+    private void saveLoanTime(String id, long time){
+        r.table(loantable).filter(row -> row.g("uid").eq(id)).update(r.hashMap("time", Long.toString(time))).run(thonk);
     }
 
     @Override
