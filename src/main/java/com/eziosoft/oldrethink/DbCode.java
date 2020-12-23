@@ -144,7 +144,6 @@ public class DbCode implements GenaricDatabase {
 
     @Override
     public void initDatabase() {
-        System.out.println(info.getUser());
         // lifted straight from floatzel 2.5.6.4's codebase, with minor tweaks
         Connection.Builder builder = r.connection().hostname("localhost").port(28015);
         if (!info.getUser().equals("null")) {
