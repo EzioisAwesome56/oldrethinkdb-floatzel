@@ -1,4 +1,4 @@
 {
   "type": "database",
-  "mainclass": "idk lol"
+  "mainclass": "com.eziosoft.oldrethink.DbCode"
 }
