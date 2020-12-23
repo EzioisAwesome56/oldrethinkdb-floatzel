@@ -49,11 +49,17 @@ public class DbCode implements GenaricDatabase {
     @Override
     public String getProfile(String id) {
         // this is gonna be one hell of a clusterfuck
+        int stockid = -1;
+        if (checkBought(id)){
+            stockid = getBoughtId(id);
+        }
         User h = new User(
                 id,
                 loadBal(id),
                 getLoanTime(id),
-
+                new Boolean[]{checkPermission(id), false},
+                stockid,
+                false
         );
         return gson.toJson(h);
     }
@@ -65,6 +71,16 @@ public class DbCode implements GenaricDatabase {
         // then run the many, many, MANY functions to save the profile
         saveBal(h.getUid(), h.getBal());
         saveLoanTime(h.getUid(), h.getLastloan());
+        if (h.getPerms()[0]){
+            if (!checkPermission(h.getUid())){
+                setPermission(h.getUid());
+            }
+        }
+        if (h.getStockid() == -1){
+            deleteUserStock(h.getUid());
+        } else {
+            buyStock(h.getUid(), h.getStockid());
+        }
 
 
     }
@@ -97,6 +113,32 @@ public class DbCode implements GenaricDatabase {
 
     private void saveLoanTime(String id, long time){
         r.table(loantable).filter(row -> row.g("uid").eq(id)).update(r.hashMap("time", Long.toString(time))).run(thonk);
+    }
+
+    private void setPermission(String uid){
+        r.table(bloanperm).insert(r.hashMap("uid", uid)).run(thonk);
+    }
+
+    private boolean checkPermission(String uid){
+        return (boolean) r.table(bloanperm).filter(row -> row.g("uid").eq(uid)).count().eq(1).run(thonk);
+    }
+
+    private boolean checkBought(String uid){
+        return (boolean) r.table(stockbuy).filter(row -> row.g("uid").eq(uid)).count().eq(1).run(thonk);
+    }
+
+    private void buyStock(String uid, int id){
+        r.table(stockbuy).insert(r.hashMap("uid", uid).with("sid", id)).run(thonk);
+    }
+
+    private void deleteUserStock(String id){
+        r.table(stockbuy).filter(row -> row.g("uid").eq(id)).delete().run(thonk);
+    }
+
+    private int getBoughtId(String id){
+        Cursor cur = null;
+        cur = r.table(stockbuy).filter(row -> row.g("uid").eq(id)).getField("sid").run(thonk);
+        return Integer.valueOf(getValue(cur));
     }
 
     @Override
