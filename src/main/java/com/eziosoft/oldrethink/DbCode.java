@@ -147,11 +147,11 @@ public class DbCode implements GenaricDatabase {
         System.out.println(info.getUser());
         // lifted straight from floatzel 2.5.6.4's codebase, with minor tweaks
         Connection.Builder builder = r.connection().hostname("localhost").port(28015);
-        /*if (!info.getUser().equals("null")) {
+        if (!info.getUser().equals("null")) {
             builder.user(info.getUser(), info.getPass().equals("null") ? "" : info.getPass());
         } else {
             builder.user("admin", info.getPass().equals("null") ? "" : info.getPass());
-        }*/
+        }
 
         thonk = builder.connect();
         System.out.println("Eziosoft RethinkDB Driver v1.0 now starting up...");
