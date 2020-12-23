@@ -9,4 +9,6 @@ public interface GenaricDatabase {
     void saveProfile(String json);
 
     void initDatabase();
+
+    boolean checkForUser(String id);
 }

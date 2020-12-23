@@ -2,6 +2,7 @@ package com.eziosoft.oldrethink;
 
 import com.google.gson.Gson;
 import com.rethinkdb.RethinkDB;
+import com.rethinkdb.gen.exc.ReqlError;
 import com.rethinkdb.net.Connection;
 import com.rethinkdb.net.Cursor;
 
@@ -51,6 +52,8 @@ public class DbCode implements GenaricDatabase {
 
     @Override
     public void saveProfile(String json) {
+        // first get user profile
+        User h =
 
     }
 
@@ -80,5 +83,36 @@ public class DbCode implements GenaricDatabase {
             System.out.println("ReThinkDB started!");
         }
         return;
+    }
+
+    @Override
+    public boolean checkForUser(String id) {
+        // lifted from 2.5.6.4
+        boolean exist = false;
+        // connection shit
+        try {
+            exist = (boolean) r.table(banktable).filter(
+                    r.hashMap("uid", id)
+            ).count().eq(1).run(thonk);
+        } catch (ReqlError e){
+            e.printStackTrace();
+            return false;
+        }
+        if (!exist){
+            // the user does not have a bank account
+            // make one instead!
+            try {
+                r.table(banktable).insert(r.array(
+                        r.hashMap("uid", id)
+                                .with("bal", 0)
+                )).run(thonk);
+            } catch (ReqlError e){
+                e.printStackTrace();
+                return false;
+            }
+            return exist;
+        } else {
+            return exist;
+        }
     }
 }
