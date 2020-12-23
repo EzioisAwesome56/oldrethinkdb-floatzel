@@ -53,8 +53,19 @@ public class DbCode implements GenaricDatabase {
     @Override
     public void saveProfile(String json) {
         // first get user profile
-        User h =
+        User h = gson.fromJson(json, User.class);
+        // then run the many, many, MANY functions to save the profile
+        saveBal(h.getUid(), h.getBal());
 
+
+    }
+
+    private void saveBal(String id, int bal){
+        try {
+            r.table(banktable).filter(row -> row.g("uid").eq(id)).update(r.hashMap("bal", bal)).run(thonk);
+        } catch (ReqlError e){
+            e.printStackTrace();
+        }
     }
 
     @Override
