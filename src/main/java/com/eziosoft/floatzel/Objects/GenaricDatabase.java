@@ -1,5 +1,7 @@
 package com.eziosoft.floatzel.Objects;
 
+import com.eziosoft.oldrethink.Stock;
+
 public interface GenaricDatabase {
 
     void Conninfo(String info);
@@ -11,4 +13,8 @@ public interface GenaricDatabase {
     void initDatabase();
 
     boolean checkForUser(String id);
+
+    int totalStocks();
+
+    void makeNewStock(String s);
 }

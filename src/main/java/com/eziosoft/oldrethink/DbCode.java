@@ -211,4 +211,14 @@ public class DbCode implements GenaricDatabase {
             return exist;
         }
     }
+
+    @Override
+    public int totalStocks() {
+        return r.table(stocktable).count().run(thonk);
+    }
+
+    @Override
+    public void makeNewStock(String s) {
+        // stuff goes here
+    }
 }
