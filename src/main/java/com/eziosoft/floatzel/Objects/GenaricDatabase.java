@@ -17,4 +17,8 @@ public interface GenaricDatabase {
     int totalStocks();
 
     void makeNewStock(String s);
+
+    void updateStock(String s);
+
+    String getStock(int id);
 }

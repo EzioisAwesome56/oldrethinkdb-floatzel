@@ -214,11 +214,59 @@ public class DbCode implements GenaricDatabase {
 
     @Override
     public int totalStocks() {
-        return r.table(stocktable).count().run(thonk);
+        return Math.toIntExact(r.table(stocktable).count().run(thonk));
     }
 
     @Override
     public void makeNewStock(String s) {
-        // stuff goes here
+        Stock w = gson.fromJson(s, Stock.class);
+        r.table(stocktable).insert(r.array(r.hashMap("sid", w.getId()).with("name", w.getName()).with("units", w.getUnits()).with("price", w.getPrice()).with("diff", 0))).run(thonk);
+    }
+
+    @Override
+    public void updateStock(String s) {
+        Stock h = gson.fromJson(s, Stock.class);
+        int old = getStockPrice(h.getId());
+        r.table(stocktable).filter(row -> row.g("sid").eq(h.getId())).update(
+                r.hashMap("price", h.getPrice())
+        ).run(thonk);
+        r.table(stocktable).filter(row -> row.g("sid").eq(h.getId())).update(
+                r.hashMap("diff", h.getDiff())
+        ).run(thonk);
+        r.table(stocktable).filter(row -> row.g("sid").eq(h.getId())).update(
+                r.hashMap("units", h.getUnits())
+        ).run(thonk);
+    }
+
+    @Override
+    public String getStock(int id) {
+        Stock h = new Stock(
+                id,
+                getStockName(id),
+                getStockUnits(id),
+                getStockPrice(id),
+                getStockDiff(id)
+        );
+        return gson.toJson(h);
+    }
+
+    private int getStockPrice(int id){
+        Cursor h = r.table(stocktable).filter(row -> row.g("sid").eq(id)).getField("price").run(thonk);
+        return Integer.valueOf(getValue(h));
+    }
+
+    private String getStockName(int id){
+        Cursor h = r.table(stocktable).filter(row -> row.g("sid").eq(id)).getField("name").run(thonk);
+        return getValue(h);
+    }
+
+    private int getStockUnits(int id){
+        Cursor h = r.table(stocktable).filter(row -> row.g("sid").eq(id)).getField("units").run(thonk);
+        return Integer.valueOf(getValue(h));
+    }
+
+    private int getStockDiff(int id){
+        Cursor h = r.table(stocktable).filter(row -> row.g("sid").eq(id)).getField("diff").run(thonk);
+        return Integer.valueOf(getValue(h));
     }
 }
