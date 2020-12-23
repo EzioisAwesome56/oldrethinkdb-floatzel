@@ -6,6 +6,8 @@ import com.rethinkdb.gen.exc.ReqlError;
 import com.rethinkdb.net.Connection;
 import com.rethinkdb.net.Cursor;
 
+import java.util.List;
+
 public class DbCode implements GenaricDatabase {
 
     private static Cursor cur = null;
@@ -68,6 +70,18 @@ public class DbCode implements GenaricDatabase {
         }
     }
 
+    private Long getLoanTime(String uid){
+        // first we check if they even have an entry in the table
+        if (!(boolean)r.table(loantable).filter(r.hashMap("uid", uid)).count().eq(1).run(thonk)){
+            // just save them a 0 and return 0
+            r.table(loantable).insert(r.array(r.hashMap("uid", uid).with("time", Long.toString(0L)))).run(thonk);
+            return 0L;
+        } else {
+            cur = r.table(loantable).filter(row -> row.g("uid").eq(uid)).getField("time").run(thonk);
+            return Long.valueOf(getValue(cur));
+        }
+    }
+
     @Override
     public void initDatabase() {
         // lifted straight from floatzel 2.5.6.4's codebase, with minor tweaks
@@ -94,6 +108,17 @@ public class DbCode implements GenaricDatabase {
             System.out.println("ReThinkDB started!");
         }
         return;
+    }
+
+    // yanked from floatzel utils
+    private static String getValue(Cursor cur) throws IndexOutOfBoundsException{
+        try {
+            List curlist = cur.toList();
+            String value = curlist.get(0).toString();
+            return value;
+        } catch (IndexOutOfBoundsException e){
+            throw e;
+        }
     }
 
     @Override
