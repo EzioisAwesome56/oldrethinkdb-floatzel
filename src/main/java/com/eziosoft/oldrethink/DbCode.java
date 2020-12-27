@@ -272,7 +272,8 @@ public class DbCode implements GenaricDatabase {
 
     @Override
     public String loadTweet(int id) {
-        return null;
+        Cursor h = r.table(stocktable).filter(row -> row.g("tid").eq(id)).getField("txt").run(thonk);
+        return gson.toJson(new Tweet(getValue(h), 0), Tweet.class);
     }
 
     private int getStockPrice(int id){
