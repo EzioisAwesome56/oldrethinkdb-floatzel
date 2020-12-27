@@ -250,6 +250,17 @@ public class DbCode implements GenaricDatabase {
         return gson.toJson(h);
     }
 
+    @Override
+    public void makeTable(String name, String key) {
+        // since we dont use primary keys in this old driver, just make the table
+        r.tableCreate(name).run(thonk);
+    }
+
+    @Override
+    public int totalTweets() {
+        return Math.toIntExact(r.table(tweets).count().run(thonk));
+    }
+
     private int getStockPrice(int id){
         Cursor h = r.table(stocktable).filter(row -> row.g("sid").eq(id)).getField("price").run(thonk);
         return Integer.valueOf(getValue(h));
@@ -262,11 +273,11 @@ public class DbCode implements GenaricDatabase {
 
     private int getStockUnits(int id){
         Cursor h = r.table(stocktable).filter(row -> row.g("sid").eq(id)).getField("units").run(thonk);
-        return Integer.valueOf(getValue(h));
+        return Integer.parseInt(getValue(h));
     }
 
     private int getStockDiff(int id){
         Cursor h = r.table(stocktable).filter(row -> row.g("sid").eq(id)).getField("diff").run(thonk);
-        return Integer.valueOf(getValue(h));
+        return Integer.parseInt(getValue(h));
     }
 }

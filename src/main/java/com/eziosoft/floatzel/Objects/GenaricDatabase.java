@@ -21,4 +21,8 @@ public interface GenaricDatabase {
     void updateStock(String s);
 
     String getStock(int id);
+
+    void makeTable(String name, String key);
+
+    int totalTweets();
 }
