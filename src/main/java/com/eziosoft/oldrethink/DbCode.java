@@ -276,6 +276,25 @@ public class DbCode implements GenaricDatabase {
         return gson.toJson(new Tweet(getValue(h), 0), Tweet.class);
     }
 
+    @Override
+    public boolean checkForStock(int id) {
+        return (boolean) r.table(stocktable).filter(row -> row.g("sid").eq(id)).count().eq(1).run(thonk);
+    }
+
+    @Override
+    public void deleteStock(int id) {
+        r.table(stocktable).filter(row -> row.g("sid").eq(id)).delete().run(thonk);
+    }
+
+    @Override
+    public void setPerm(String uid, int id) {
+        if (id == 1){
+            r.table(bloanperm).insert(r.hashMap("uid", uid)).run(thonk);
+        } else {
+            System.err.println("Setting this permission is unsupported by this driver.");
+        }
+    }
+
     private int getStockPrice(int id){
         Cursor h = r.table(stocktable).filter(row -> row.g("sid").eq(id)).getField("price").run(thonk);
         return Integer.valueOf(getValue(h));

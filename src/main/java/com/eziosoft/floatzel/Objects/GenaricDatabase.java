@@ -29,4 +29,10 @@ public interface GenaricDatabase {
     void saveTweet(String s);
 
     String loadTweet(int id);
+
+    boolean checkForStock(int id);
+
+    void deleteStock(int id);
+
+    void setPerm (String uid, int id);
 }
