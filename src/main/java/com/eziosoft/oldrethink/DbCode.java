@@ -261,6 +261,20 @@ public class DbCode implements GenaricDatabase {
         return Math.toIntExact(r.table(tweets).count().run(thonk));
     }
 
+    @Override
+    public void saveTweet(String s) {
+        Tweet t = gson.fromJson(s, Tweet.class);
+        r.table(tweets).insert(r.array(
+                r.hashMap("tid", t.getId())
+                        .with("txt", t.getText())
+        )).run(thonk);
+    }
+
+    @Override
+    public String loadTweet(int id) {
+        return null;
+    }
+
     private int getStockPrice(int id){
         Cursor h = r.table(stocktable).filter(row -> row.g("sid").eq(id)).getField("price").run(thonk);
         return Integer.valueOf(getValue(h));
